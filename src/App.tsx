@@ -43,57 +43,70 @@ const Navbar = () => {
     { name: 'Kontakt', href: '#kontakt' }
   ];
 
-  return (
-        <nav className={`fixed w-full z-50 transition-all duration-500 ${scrolled ? 'bg-transparent py-3 md:py-4 px-3 md:px-6' : 'bg-transparent py-2'}`}>
-      <div className={`flex items-center justify-between transition-all duration-500 ${scrolled ? 'max-w-6xl mx-auto rounded-full bg-brand-bg/55 backdrop-blur-2xl shadow-[0_10px_40px_rgba(0,0,0,0.45)] pl-6 md:pl-8 pr-3 py-2' : 'max-w-7xl mx-auto px-6 md:px-12'}`}>
-        <a href="#" className="flex items-center">
-          <img
-            src="https://ridbtuorcmkjidenxudx.supabase.co/storage/v1/object/public/Kamenarstvo/Gemini_Generated_Image_7nvwf87nvwf87nvw-Photoroom.webp"
-            alt="Kameň & Dielo"
-            fetchPriority="high"
-            decoding="async"
-            className={`w-auto object-contain transition-all duration-500 ${scrolled ? 'h-12 md:h-14' : 'h-20 md:h-28'}`}
-            referrerPolicy="no-referrer"
-          />
-        </a>
+  const containerClasses = scrolled
+    ? `max-w-6xl mx-auto rounded-[32px] bg-brand-bg/55 backdrop-blur-2xl shadow-[0_10px_40px_rgba(0,0,0,0.45)] md:rounded-full ${
+        isOpen
+          ? 'pl-6 pr-3 pt-2 pb-4 md:pl-8 md:py-2 md:pb-2'
+          : 'pl-6 md:pl-8 pr-3 py-2'
+      }`
+    : isOpen
+      ? 'max-w-7xl mx-auto rounded-[32px] bg-brand-bg/70 backdrop-blur-2xl shadow-[0_10px_40px_rgba(0,0,0,0.45)] px-5 pt-2 pb-4 md:rounded-none md:bg-transparent md:backdrop-blur-none md:shadow-none md:px-12 md:py-0 md:pt-0 md:pb-0'
+      : 'max-w-7xl mx-auto rounded-[32px] px-6 md:px-12 md:rounded-none';
 
-        {/* Desktop Nav */}
-        <div className={`hidden md:flex items-center transition-all duration-500 ${scrolled ? 'gap-6' : 'gap-10'}`}>
-          <ul className={`flex items-center transition-all duration-500 ${scrolled ? 'gap-6' : 'gap-8'}`}>
+  return (
+    <nav className={`fixed w-full z-50 transition-all duration-500 ${scrolled ? 'bg-transparent py-3 md:py-4 px-3 md:px-6' : 'bg-transparent py-2'}`}>
+      <div className={`transition-all duration-500 ${containerClasses}`}>
+        <div className="flex items-center justify-between">
+          <a href="#" className="flex items-center">
+            <img
+              src="/fotky/logo-400.webp"
+              srcSet="/fotky/logo-200.webp 200w, /fotky/logo-400.webp 400w"
+              sizes="200px"
+              alt="Kameň & Dielo"
+              fetchPriority="high"
+              decoding="async"
+              className={`w-auto object-contain transition-all duration-500 ${scrolled ? 'h-12 md:h-14' : 'h-20 md:h-28'}`}
+            />
+          </a>
+
+          {/* Desktop Nav */}
+          <div className={`hidden md:flex items-center transition-all duration-500 ${scrolled ? 'gap-6' : 'gap-10'}`}>
+            <ul className={`flex items-center transition-all duration-500 ${scrolled ? 'gap-6' : 'gap-8'}`}>
+              {links.map((link) => (
+                <li key={link.name}>
+                  <a href={link.href} className="text-[13px] uppercase tracking-[1.5px] text-brand-text/90 hover:text-brand-gold transition-colors font-medium">
+                    {link.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <a
+              href="#kontakt"
+              className={`relative inline-flex items-center justify-center rounded-full uppercase tracking-[2px] text-brand-gold font-medium bg-white/[0.06] backdrop-blur-xl border border-white/15 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.18),inset_0_-1px_0_0_rgba(0,0,0,0.25),0_8px_24px_rgba(0,0,0,0.35)] transition-all duration-300 ${scrolled ? 'px-5 py-[10px] text-[12px]' : 'px-[28px] py-[14px] text-[13px]'}`}
+            >
+              <span className="relative z-10">Cenová ponuka</span>
+              <span aria-hidden className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-b from-white/15 via-transparent to-transparent opacity-60"></span>
+            </a>
+          </div>
+
+          {/* Mobile Toggle */}
+          <button onClick={() => setIsOpen(!isOpen)} aria-label={isOpen ? 'Zavrieť menu' : 'Otvoriť menu'} className="md:hidden w-11 h-11 flex items-center justify-center text-brand-muted">
+            {isOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
+        </div>
+
+        {/* Mobile Nav — integrated into pill */}
+        <div className={`md:hidden overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-96 mt-3 pt-4 border-t border-brand-border/40' : 'max-h-0'}`}>
+          <ul className="flex flex-col items-center gap-5 pb-1">
             {links.map((link) => (
               <li key={link.name}>
-                <a href={link.href} className="text-[13px] uppercase tracking-[1.5px] text-brand-text/90 hover:text-brand-gold transition-colors font-medium">
+                <a href={link.href} onClick={() => setIsOpen(false)} className="text-[14px] uppercase tracking-[2px] font-sans text-brand-muted hover:text-brand-gold transition-colors">
                   {link.name}
                 </a>
               </li>
             ))}
           </ul>
-          <a
-            href="#kontakt"
-            className={`relative inline-flex items-center justify-center rounded-full uppercase tracking-[2px] text-brand-gold font-medium bg-white/[0.06] backdrop-blur-xl border border-white/15 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.18),inset_0_-1px_0_0_rgba(0,0,0,0.25),0_8px_24px_rgba(0,0,0,0.35)] transition-all duration-300 ${scrolled ? 'px-5 py-[10px] text-[12px]' : 'px-[28px] py-[14px] text-[13px]'}`}
-          >
-            <span className="relative z-10">Cenová ponuka</span>
-            <span aria-hidden className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-b from-white/15 via-transparent to-transparent opacity-60"></span>
-          </a>
         </div>
-
-        {/* Mobile Toggle */}
-        <button onClick={() => setIsOpen(!isOpen)} aria-label={isOpen ? 'Zavrieť menu' : 'Otvoriť menu'} className="md:hidden w-11 h-11 flex items-center justify-center text-brand-muted">
-          {isOpen ? <X size={28} /> : <Menu size={28} />}
-        </button>
-      </div>
-
-      {/* Mobile Nav */}
-      <div className={`absolute top-full left-0 w-full bg-brand-bg border-b border-brand-border overflow-hidden transition-all duration-300 md:hidden ${isOpen ? 'max-h-96 py-6' : 'max-h-0 py-0'}`}>
-        <ul className="flex flex-col items-center gap-6">
-          {links.map((link) => (
-            <li key={link.name}>
-              <a href={link.href} onClick={() => setIsOpen(false)} className="text-[14px] uppercase tracking-[2px] font-sans text-brand-muted hover:text-brand-gold transition-colors">
-                {link.name}
-              </a>
-            </li>
-          ))}
-        </ul>
       </div>
     </nav>
   );
@@ -105,7 +118,7 @@ const Hero = () => {
       {/* pozadie — fotka */}
       <img
         src="/fotky/hero-kamen-1920.webp"
-        srcSet="/fotky/hero-kamen-1280.webp 1280w, /fotky/hero-kamen-1920.webp 1920w, /fotky/hero-kamen-2560.webp 2560w"
+        srcSet="/fotky/hero-kamen-640.webp 640w, /fotky/hero-kamen-1280.webp 1280w, /fotky/hero-kamen-1920.webp 1920w, /fotky/hero-kamen-2560.webp 2560w"
         sizes="100vw"
         alt=""
         fetchPriority="high"
@@ -270,12 +283,13 @@ const About = () => {
         >
           <div className="absolute inset-0 rounded-2xl overflow-hidden">
             <img
-              src="https://ridbtuorcmkjidenxudx.supabase.co/storage/v1/object/public/Kamenarstvo/Gemini_Generated_Image_ar1hdjar1hdjar1h.png"
+              src="/fotky/about-1280.webp"
+              srcSet="/fotky/about-640.webp 640w, /fotky/about-1280.webp 1280w, /fotky/about-1920.webp 1920w"
+              sizes="(max-width: 1024px) 100vw, 50vw"
               alt="Kamenárska práca"
               loading="lazy"
               decoding="async"
               className="w-full h-full object-cover transition-transform duration-[900ms] hover:scale-[1.03]"
-              referrerPolicy="no-referrer"
             />
             {/* jemný gradient v rohoch pre hĺbku */}
             <div className="absolute inset-0 bg-gradient-to-tr from-brand-bg/40 via-transparent to-transparent pointer-events-none"></div>
@@ -390,7 +404,7 @@ const Services = () => {
       no: 'IV',
       title: 'Bytová Architektúra',
       desc: 'Luxusné kuchynské dosky, kúpeľňové obklady, parapety a krby z naturálneho i technického kameňa.',
-      img: 'https://ridbtuorcmkjidenxudx.supabase.co/storage/v1/object/public/Kamenarstvo/Gemini_Generated_Image_vw58jqvw58jqvw58%20(1).png'
+      img: '/fotky/service-bytova-1280.webp'
     },
     {
       no: 'V',
@@ -402,7 +416,7 @@ const Services = () => {
       no: 'VI',
       title: 'Doplnky',
       desc: 'Vázy, lampáše, písmo, ozdobné prvky a kamenné detaily dopĺňajúce každý pomník do finálnej podoby.',
-      img: 'https://ridbtuorcmkjidenxudx.supabase.co/storage/v1/object/public/Kamenarstvo/10ef7f0e-9de7-4e55-95a6-0c617cbf6796-1_all_7791.jpg'
+      img: '/fotky/service-doplnky-1280.webp'
     }
   ];
 
@@ -1211,12 +1225,13 @@ const Footer = () => {
         <div className="md:col-span-2">
           <a href="#" className="inline-block mb-4">
             <img
-              src="https://ridbtuorcmkjidenxudx.supabase.co/storage/v1/object/public/Kamenarstvo/Gemini_Generated_Image_7nvwf87nvwf87nvw-Photoroom.webp"
+              src="/fotky/logo-400.webp"
+              srcSet="/fotky/logo-200.webp 200w, /fotky/logo-400.webp 400w"
+              sizes="200px"
               alt="Kameň & Dielo"
               loading="lazy"
               decoding="async"
               className="h-20 w-auto object-contain"
-              referrerPolicy="no-referrer"
             />
           </a>
           <p className="text-brand-muted text-[12px] leading-[1.6] max-w-sm">S úctou a precíznosťou tvoríme trvalé spomienky a moderné interiéry z prírodného kameňa už tri desaťročia.</p>
