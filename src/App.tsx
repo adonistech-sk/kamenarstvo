@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Menu, X, Phone, Mail, MapPin, ChevronRight, Hammer, PenTool, HardHat, ShieldCheck, ArrowRight, MessageSquare, Loader2, Check, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect, useRef, createContext, useContext, useCallback } from 'react';
+import { Menu, X, Phone, Mail, MapPin, ChevronRight, Hammer, PenTool, HardHat, ShieldCheck, ArrowRight, MessageSquare, Loader2, Check, AlertCircle, Plus, Cookie } from 'lucide-react';
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'motion/react';
 import emailjs from '@emailjs/browser';
 
@@ -19,6 +19,81 @@ const staggerContainer = {
 
 const fotkaSrcSet = (base: string) =>
   `/fotky/${base}-640.webp 640w, /fotky/${base}-1280.webp 1280w, /fotky/${base}-1920.webp 1920w`;
+
+type ConsentValue = 'accepted' | 'declined' | null;
+const CONSENT_STORAGE_KEY = 'kamen_cookie_consent_v1';
+
+const ConsentContext = createContext<{
+  consent: ConsentValue;
+  setConsent: (v: Exclude<ConsentValue, null>) => void;
+}>({ consent: null, setConsent: () => {} });
+
+const ConsentProvider = ({ children }: { children: React.ReactNode }) => {
+  const [consent, setConsentState] = useState<ConsentValue>(null);
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(CONSENT_STORAGE_KEY);
+      if (stored === 'accepted' || stored === 'declined') setConsentState(stored);
+    } catch {
+      // localStorage unavailable — banner will simply show every visit
+    }
+  }, []);
+
+  const setConsent = useCallback((v: Exclude<ConsentValue, null>) => {
+    try { window.localStorage.setItem(CONSENT_STORAGE_KEY, v); } catch { /* ignore */ }
+    setConsentState(v);
+  }, []);
+
+  return <ConsentContext.Provider value={{ consent, setConsent }}>{children}</ConsentContext.Provider>;
+};
+
+const useConsent = () => useContext(ConsentContext);
+
+const CookieBanner = () => {
+  const { consent, setConsent } = useConsent();
+
+  return (
+    <AnimatePresence>
+      {consent === null && (
+        <m.div
+          initial={{ y: 80, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 80, opacity: 0 }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
+          role="dialog"
+          aria-label="Súhlas s cookies"
+          className="fixed inset-x-0 bottom-0 z-[120] px-4 pb-4 md:px-6 md:pb-6 pointer-events-none"
+        >
+          <div className="max-w-5xl mx-auto bg-brand-surface/95 backdrop-blur-md border border-brand-border rounded-2xl shadow-2xl p-5 md:p-6 flex flex-col md:flex-row md:items-center gap-4 md:gap-6 pointer-events-auto">
+            <div className="flex items-start gap-3 md:flex-1">
+              <Cookie size={22} strokeWidth={1.5} className="text-brand-gold shrink-0 mt-0.5" />
+              <p className="text-[13px] text-brand-muted leading-[1.6]">
+                Používame nevyhnutné cookies pre správne fungovanie stránky a voliteľnú mapu Google. Môžete ich prijať alebo odmietnuť — vaša voľba bude zapamätaná.
+              </p>
+            </div>
+            <div className="flex gap-3 shrink-0">
+              <button
+                type="button"
+                onClick={() => setConsent('declined')}
+                className="px-5 py-2.5 border border-brand-border text-brand-muted hover:border-brand-gold/60 hover:text-brand-gold rounded-full text-[11px] uppercase tracking-[2px] transition-colors"
+              >
+                Odmietnuť
+              </button>
+              <button
+                type="button"
+                onClick={() => setConsent('accepted')}
+                className="px-5 py-2.5 bg-brand-gold text-brand-bg hover:bg-brand-gold/90 rounded-full text-[11px] uppercase tracking-[2px] font-semibold transition-colors"
+              >
+                Prijať
+              </button>
+            </div>
+          </div>
+        </m.div>
+      )}
+    </AnimatePresence>
+  );
+};
 
 const localFotkaSrcSet = (img: string): string | undefined => {
   const match = img.match(/^\/fotky\/(.+)-1280\.webp$/);
@@ -40,6 +115,7 @@ const Navbar = () => {
     { name: 'Služby', href: '#sluzby' },
     { name: 'Galéria', href: '#galeria' },
     { name: 'Proces', href: '#proces' },
+    { name: 'Otázky', href: '#faq' },
     { name: 'Kontakt', href: '#kontakt' }
   ];
 
@@ -479,7 +555,7 @@ const Services = () => {
                     src={service.img}
                     srcSet={localFotkaSrcSet(service.img)}
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    alt={service.title}
+                    alt={`${service.title} — kamenárska realizácia z prírodného kameňa`}
                     loading="lazy"
                     decoding="async"
                     className="w-full h-full object-cover transition-transform duration-[900ms] group-hover:scale-[1.06]"
@@ -602,7 +678,7 @@ const Services = () => {
                       src={`/fotky/${base}-640.webp`}
                       srcSet={fotkaSrcSet(base)}
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      alt={`${activeMeta.titleItalic} ${i + 1}`}
+                      alt={`${activeMeta.titleItalic} z prírodného kameňa — realizácia Kamenárstva Veľký Kýr (${i + 1})`}
                       loading="lazy"
                       decoding="async"
                       width={1280}
@@ -666,7 +742,7 @@ const Services = () => {
             <m.img
               key={activePhoto}
               src={`/fotky/${activePhotos[activePhoto]}-1920.webp`}
-              alt={`${activeMeta?.titleItalic ?? ''} ${activePhoto + 1}`}
+              alt={`${activeMeta?.titleItalic ?? 'Kamenárska realizácia'} z prírodného kameňa — detail ${activePhoto + 1}`}
               decoding="async"
               initial={{ scale: 0.96, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -883,7 +959,7 @@ const Gallery = () => {
                       src={`/fotky/${base}-640.webp`}
                       srcSet={fotkaSrcSet(base)}
                       sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
-                      alt={`Realizácia ${i + 1}`}
+                      alt={`Kamenárska realizácia ${String(i + 1).padStart(2, '0')} — pomník z prírodného kameňa, Kamenárstvo Veľký Kýr`}
                       loading="lazy"
                       decoding="async"
                       width={1280}
@@ -979,7 +1055,7 @@ const Gallery = () => {
             <m.img
               key={activePhoto}
               src={`/fotky/${images[activePhoto]}-1920.webp`}
-              alt={`Realizácia ${activePhoto + 1}`}
+              alt={`Kamenárska realizácia ${String(activePhoto + 1).padStart(2, '0')} — detail pomníka z prírodného kameňa`}
               decoding="async"
               initial={{ scale: 0.96, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -997,6 +1073,143 @@ const Gallery = () => {
           </m.div>
         )}
       </AnimatePresence>
+    </section>
+  );
+};
+
+const MapEmbed = () => {
+  const { consent, setConsent } = useConsent();
+
+  if (consent === 'accepted') {
+    return (
+      <div className="mt-10 rounded-2xl overflow-hidden border border-brand-border">
+        <iframe
+          title="Mapa — Kamenárstvo Veľký Kýr, Novozámocká 95"
+          src="https://www.google.com/maps?q=Novoz%C3%A1mock%C3%A1%2095%2C%20941%2007%20Ve%C4%BEk%C3%BD%20K%C3%BDr&output=embed"
+          width="100%"
+          height="280"
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          style={{ border: 0, display: 'block' }}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-10 rounded-2xl border border-brand-border bg-brand-surface/40 p-6 md:p-8 flex flex-col items-start gap-4">
+      <div className="flex items-start gap-3">
+        <MapPin className="text-brand-gold shrink-0 mt-0.5" size={22} strokeWidth={1.5} />
+        <p className="text-[13px] text-brand-muted leading-[1.6] max-w-md">
+          Mapa Google sa načíta po udelení súhlasu s cookies. Naša adresa:{' '}
+          <span className="text-brand-text">Novozámocká 95, 941 07 Veľký Kýr</span>.
+        </p>
+      </div>
+      <button
+        type="button"
+        onClick={() => setConsent('accepted')}
+        className="px-5 py-2.5 border border-brand-gold/60 text-brand-gold hover:bg-brand-gold hover:text-brand-bg rounded-full text-[11px] uppercase tracking-[2px] transition-colors"
+      >
+        Zobraziť mapu
+      </button>
+    </div>
+  );
+};
+
+const faqItems: { q: string; a: string }[] = [
+  {
+    q: 'Aké materiály používate pri výrobe pomníkov?',
+    a: 'Pracujeme predovšetkým s prírodnou žulou v rôznych farbách a s mramorom. Na bytovú architektúru dodávame aj technický kameň. Každý blok starostlivo vyberáme podľa štruktúry a farby, aby výsledné dielo vydržalo desaťročia.',
+  },
+  {
+    q: 'Koľko trvá výroba pomníka?',
+    a: 'Od schválenia návrhu zvyčajne 6 až 10 týždňov v závislosti od zložitosti diela, typu kameňa a doplnkov. Pri jednoduchších realizáciách dokážeme termín skrátiť, pri náročnejších kryptách môže byť dlhší.',
+  },
+  {
+    q: 'Osadíte pomník aj na inom cintoríne mimo Veľkého Kýra?',
+    a: 'Áno. Pôsobíme v celom Nitrianskom kraji a realizácie zabezpečujeme aj v ďalších regiónoch Slovenska. Prepravu, osadenie a dokončovacie práce zastrešíme kompletne našim tímom.',
+  },
+  {
+    q: 'Zhotovujete aj písmo a renováciu starších pomníkov?',
+    a: 'Áno. Dopĺňame mená a dátumy, obnovujeme staré nápisy, leštíme a renovujeme existujúce pomníky. Meníme lampáše, vázy a kompletne upravujeme hrobové miesta pred dušičkami.',
+  },
+  {
+    q: 'Aká je záruka na kamenné dielo?',
+    a: 'Na materiál aj remeselné spracovanie poskytujeme zákonnú záruku. Kvalita prírodného kameňa a spôsob osadenia sú navrhnuté tak, aby dielo vydržalo generácie — v praxi naše realizácie stoja bez problémov viac ako 20 rokov.',
+  },
+  {
+    q: 'Ako prebieha cenová ponuka?',
+    a: 'Stačí zavolať alebo poslať nezáväznú správu cez kontaktný formulár. Dohodneme si osobné stretnutie alebo obhliadku hrobového miesta a do niekoľkých dní pripravíme presný návrh s cenou na mieru.',
+  },
+];
+
+const FAQ = () => {
+  const [open, setOpen] = useState<number | null>(0);
+
+  return (
+    <section id="faq" className="py-24 md:py-32 px-6 border-t border-brand-border">
+      <div className="max-w-4xl mx-auto">
+        <m.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-100px' }}
+          variants={fadeUp}
+          className="mb-12 md:mb-16"
+        >
+          <div className="flex items-center gap-[10px] mb-[20px]">
+            <span className="font-serif text-[11px] uppercase tracking-[3px] text-brand-gold">Časté Otázky</span>
+            <div className="h-[1px] flex-grow bg-brand-border"></div>
+          </div>
+          <h2 className="font-serif text-[28px] sm:text-[34px] md:text-[56px] text-brand-text leading-[1.1]">
+            Odpovede na to, čo sa <span className="italic text-brand-gold">najčastejšie pýtate</span>.
+          </h2>
+        </m.div>
+
+        <m.ul
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-100px' }}
+          className="divide-y divide-brand-border border-y border-brand-border"
+        >
+          {faqItems.map((item, i) => {
+            const isOpen = open === i;
+            return (
+              <m.li key={i} variants={fadeUp} className="py-2">
+                <button
+                  type="button"
+                  onClick={() => setOpen(isOpen ? null : i)}
+                  aria-expanded={isOpen}
+                  className="w-full flex items-start justify-between gap-6 py-5 text-left group"
+                >
+                  <span className="font-serif text-[18px] md:text-[22px] text-brand-text group-hover:text-brand-gold transition-colors leading-snug">
+                    {item.q}
+                  </span>
+                  <span
+                    className={`shrink-0 mt-1 w-9 h-9 rounded-full border border-brand-border text-brand-gold flex items-center justify-center transition-transform duration-300 ${
+                      isOpen ? 'rotate-45 border-brand-gold/60' : 'group-hover:border-brand-gold/60'
+                    }`}
+                    aria-hidden
+                  >
+                    <Plus size={16} strokeWidth={1.6} />
+                  </span>
+                </button>
+                <div
+                  className={`grid transition-[grid-template-rows] duration-300 ease-out ${
+                    isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+                  }`}
+                >
+                  <div className="overflow-hidden">
+                    <p className="text-[14px] text-brand-muted leading-[1.7] pb-6 pr-14 max-w-3xl">
+                      {item.a}
+                    </p>
+                  </div>
+                </div>
+              </m.li>
+            );
+          })}
+        </m.ul>
+      </div>
     </section>
   );
 };
@@ -1080,6 +1293,8 @@ const Contact = () => {
               </div>
             </div>
           </div>
+
+          <MapEmbed />
         </m.div>
 
         {/* Form Column */}
@@ -1244,6 +1459,7 @@ const Footer = () => {
             <li><a href="#sluzby" className="text-brand-muted hover:text-brand-gold transition-colors">Služby</a></li>
             <li><a href="#galeria" className="text-brand-muted hover:text-brand-gold transition-colors">Galéria</a></li>
             <li><a href="#proces" className="text-brand-muted hover:text-brand-gold transition-colors">Proces</a></li>
+            <li><a href="#faq" className="text-brand-muted hover:text-brand-gold transition-colors">Časté otázky</a></li>
           </ul>
         </div>
 
@@ -1262,7 +1478,17 @@ const Footer = () => {
 
       <div className="max-w-7xl mx-auto border-t border-brand-border pt-8 flex flex-col md:flex-row justify-between items-center text-brand-muted text-[10px] uppercase tracking-[2px]">
         <p>&copy; {new Date().getFullYear()} Kamenárstvo. Všetky práva vyhradené.</p>
-        <p className="mt-4 md:mt-0">Navrhnuté s precíznosťou.</p>
+        <p className="mt-4 md:mt-0 text-[13px] tracking-[2.5px] text-brand-text">
+          <span className="text-[10px] tracking-[2px] text-brand-muted">Vytvorené</span>{' '}
+          <a
+            href="https://www.adonistech.sk"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-brand-gold hover:text-brand-text transition-colors"
+          >
+            AdonisTech
+          </a>
+        </p>
       </div>
     </footer>
   );
@@ -1271,16 +1497,20 @@ const Footer = () => {
 export default function App() {
   return (
     <LazyMotion features={domAnimation} strict>
-      <div className="min-h-screen bg-brand-bg font-sans selection:bg-brand-gold selection:text-brand-bg">
-        <Navbar />
-        <Hero />
-        <About />
-        <Services />
-        <Process />
-        <Gallery />
-        <Contact />
-        <Footer />
-      </div>
+      <ConsentProvider>
+        <div className="min-h-screen bg-brand-bg font-sans selection:bg-brand-gold selection:text-brand-bg">
+          <Navbar />
+          <Hero />
+          <About />
+          <Services />
+          <Process />
+          <Gallery />
+          <FAQ />
+          <Contact />
+          <Footer />
+          <CookieBanner />
+        </div>
+      </ConsentProvider>
     </LazyMotion>
   );
 }

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://endearing-ganache-bcb0ea.netlify.app/sitemap.xml
+Sitemap: https://kamenarstvo-bm.sk/sitemap.xml

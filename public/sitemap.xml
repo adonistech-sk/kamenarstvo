@@ -2,13 +2,44 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
-    <loc>https://endearing-ganache-bcb0ea.netlify.app/</loc>
+    <loc>https://kamenarstvo-bm.sk/</loc>
     <lastmod>2026-04-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
     <image:image>
-      <image:loc>https://endearing-ganache-bcb0ea.netlify.app/fotky/hero-kamen-1920.webp</image:loc>
+      <image:loc>https://kamenarstvo-bm.sk/fotky/hero-kamen-1920.webp</image:loc>
       <image:title>Kamenárstvo Veľký Kýr — pomníky a kamenné diela</image:title>
+      <image:caption>Ručne zhotovené pomníky a kamenné dosky z prírodného kameňa.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://kamenarstvo-bm.sk/fotky/jednohroby-01-1920.webp</image:loc>
+      <image:title>Jednohrob z prírodnej žuly — Kamenárstvo Veľký Kýr</image:title>
+      <image:caption>Ručne zhotovený jednohrob z prírodnej žuly, realizácia v regióne Nitra.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://kamenarstvo-bm.sk/fotky/dvojhroby-01-1920.webp</image:loc>
+      <image:title>Dvojhrob — rodinná hrobka z kameňa</image:title>
+      <image:caption>Monumentálny dvojhrob s nadčasovým dizajnom, Kamenárstvo Veľký Kýr.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://kamenarstvo-bm.sk/fotky/krypty-01-1920.webp</image:loc>
+      <image:title>Krypta z prírodného kameňa</image:title>
+      <image:caption>Trvácna krypta zhotovená s úctou k tradícii.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://kamenarstvo-bm.sk/fotky/urny-01-1920.webp</image:loc>
+      <image:title>Urnové miesto zo žuly</image:title>
+      <image:caption>Dôstojné urnové miesta a kolumbáriové prvky z kvalitnej žuly.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://kamenarstvo-bm.sk/fotky/bytovaarchitektura-01-1920.webp</image:loc>
+      <image:title>Bytová architektúra z prírodného kameňa</image:title>
+      <image:caption>Kuchynské dosky, obklady a parapety z prírodného kameňa na mieru.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://kamenarstvo-bm.sk/fotky/doplnky-01-1920.webp</image:loc>
+      <image:title>Kamenárske doplnky — vázy, lampáše, písmo</image:title>
+      <image:caption>Vázy, lampáše a ozdobné kamenné prvky dopĺňajúce každý pomník.</image:caption>
     </image:image>
   </url>
 </urlset>
